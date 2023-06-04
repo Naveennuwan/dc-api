@@ -16,7 +16,6 @@ class Stock extends Model
         'expire_date',
         'quantity',
         'price',
-        'selling_price',
         'created_by', 
         'center_id',
     ];

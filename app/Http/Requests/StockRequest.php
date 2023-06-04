@@ -26,7 +26,6 @@ class StockRequest extends FormRequest
             'expire_date' => 'required|date|after:today',
             'quantity' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
         ];
     }
 }

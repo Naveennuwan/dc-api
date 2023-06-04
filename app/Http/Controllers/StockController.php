@@ -24,7 +24,6 @@ class StockController extends Controller
         $stock->expire_date = $request->input('expire_date');
         $stock->quantity = $request->input('quantity');
         $stock->price = $request->input('price');
-        $stock->selling_price = $request->input('selling_price');
         $stock->center_id = $request->input('center_id');
         $stock->created_by = $user->id;
 

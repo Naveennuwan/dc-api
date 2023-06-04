@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stocks', function (Blueprint $table) {
+        Schema::create('master_data', function (Blueprint $table) {
             $table->integer('id', true, true);
-            $table->foreignIdFor(\App\Models\Products::class, 'product_id');
+            $table->decimal('profite', 8, 2);
+            $table->decimal('discount', 8, 2);
             $table->foreignIdFor(\App\Models\Center::class, 'center_id');
-            $table->date('expire_date');
-            $table->decimal('quantity', 8, 2);
-            $table->decimal('price', 8, 2);
-            $table->foreignIdFor(\App\Models\User::class, 'created_by');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stocks');
+        Schema::dropIfExists('master_data');
     }
 };

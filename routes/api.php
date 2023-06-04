@@ -14,6 +14,7 @@ use App\Http\Controllers\TemplateTypesController;
 use App\Http\Controllers\UserTypeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\MasterDataController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,10 +75,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //stock
     Route::get('/stock/{centerid}', [StockController::class, 'GetAll']);
-    // Route::get('/stock/all', [StockController::class, 'GetAll']);
     Route::post('/stock', [StockController::class, 'Store']);
-    // Route::put('/stock/{id}', [StockController::class, 'Update']);
-    // Route::delete('/stock/{id}', [StockController::class, 'SoftDelete']);
+
+    //Data
+    Route::get('/master', [MasterDataController::class, 'GetAll']);
+    Route::put('/master/{id}', [MasterDataController::class, 'Update']);
     
     //supplier
     Route::get('/supplier', [SupplierController::class, 'GetActive']);
@@ -99,6 +101,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
     //Invoice
     Route::post('/invoice', [InvoiceController::class, 'Index']);
+    Route::post('/invoice/calculate', [InvoiceController::class, 'Calculate']);
 });
 
 Route::get('/clear-cache', function () {
