@@ -11,5 +11,10 @@ class Center extends Model
 
     protected $fillable = [
         'center',
+        'address_01',
+        'address_02',
+        'contact_no',
+        'work_days',
+        'service_time',
     ];
 }

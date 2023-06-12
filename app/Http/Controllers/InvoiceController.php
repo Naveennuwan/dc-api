@@ -163,7 +163,7 @@ class InvoiceController extends Controller
 
         $MasterData = MasterData::where('center_id', $center)->first();
 
-        
+
         $profite = $MasterData->profite;
         $discount = $MasterData->discount;
 

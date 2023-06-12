@@ -15,6 +15,10 @@ class AuthController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users',
+            'designation' => 'required',
+            'base_hospital' => 'required',
+            'campus' => 'required',
+            'slmc_reg_no' => 'required',
             'password' => 'required|min:6',
             'center' => 'required',
         ]);
@@ -23,6 +27,10 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
+            'designation' => $request->input('designation'),
+            'base_hospital' => $request->input('base_hospital'),
+            'campus' => $request->input('campus'),
+            'slmc_reg_no' => $request->input('slmc_reg_no'),
             'user_type' => 2,
             'password' => bcrypt($request->input('password'))
         ]);

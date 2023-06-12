@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('designation',200);
+            $table->string('base_hospital',200);
+            $table->string('campus',200);
+            $table->string('slmc_reg_no',200);
             $table->foreignIdFor(\App\Models\UserType::class, 'user_type');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

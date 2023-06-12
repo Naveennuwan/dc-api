@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('centers', function (Blueprint $table) {
             $table->integer('id', true, true);
             $table->string('center',50);
+            $table->string('address_01',60);
+            $table->string('address_02',60);
+            $table->string('contact_no',15);
+            $table->string('work_days',30);
+            $table->string('service_time',30);
         });
     }
 

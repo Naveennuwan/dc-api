@@ -15,6 +15,7 @@ use App\Http\Controllers\UserTypeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\PdfController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/centers', [CenterController::class, 'GetAll']);
 Route::get('/user-type', [UserTypeController::class, 'GetAll']);
+
+Route::get('/invoice/{id}', [PdfController::class, 'Invoice']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
