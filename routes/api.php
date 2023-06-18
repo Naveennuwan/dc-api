@@ -36,6 +36,7 @@ Route::get('/centers', [CenterController::class, 'GetAll']);
 Route::get('/user-type', [UserTypeController::class, 'GetAll']);
 
 Route::get('/invoice/{id}', [PdfController::class, 'Invoice']);
+Route::get('/invoice-row', [InvoiceController::class, 'abc']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();

@@ -13,6 +13,7 @@ class TemplateController extends Controller
     {
         $user = Auth::user();
         return TemplateHeader::with('templateBodies')
+            ->with('templateType')
             ->where('template_headers.is_deleted', false)
             ->where('template_center_id', $centerid)
             ->get();
@@ -22,6 +23,7 @@ class TemplateController extends Controller
     {
         $user = Auth::user();
         return TemplateHeader::with('templateBodies')
+            ->with('templateType')
             ->where('template_headers.is_active', true)
             ->where('template_headers.is_deleted', false)
             ->where('template_type_id', $typeId)
@@ -33,6 +35,7 @@ class TemplateController extends Controller
     {
         $user = Auth::user();
         $template = TemplateHeader::with('templateBodies')
+            ->with('templateType')
             ->where('template_center_id', $user->center)
             ->where('id', $id)
             ->get();

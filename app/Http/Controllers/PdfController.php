@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Center;
 use App\Models\TemplateBody;
 use App\Models\InvoiceHeader;
+use App\Models\InvoiceBody;
 use App\Models\Products;
 use App\Models\Patient;
 use App\Models\User;
@@ -22,7 +23,6 @@ class PdfController extends Controller
 
         $pdf->SetPrintHeader(false);
 
-        $publicPath = public_path();
         $imagePath = public_path() . '/Logo/image.png';
         $logoWidth = 30;
 
@@ -71,6 +71,7 @@ class PdfController extends Controller
         $pdf->SetFont('Helvetica', '', $font_size_10);
         $pdf->Write(0, 'Invoice No: '. $Header['invoice'], '', 0, 'L', true, 0, false, false, 0);
         $pdf->Write(0, 'Center: '. $Center['center'], '', 0, 'L', true, 0, false, false, 0);
+        $pdf->SetFont('Helvetica', '', $font_size_08);
         $pdf->Write(0, 'Created At: '. $Header['created_at'], '', 0, 'L', true, 0, false, false, 0);
         
         $pdf->Ln(2);
@@ -81,28 +82,45 @@ class PdfController extends Controller
         $pdf->SetFont('Helvetica', '', 9);
         $pdf->Write(0, 'Base Hospital: '. $User['base_hospital'], '', 0, 'L', true, 0, false, false, 0);
     
-        
-        $products = array(
-            array(
-                'name' => 'Treatment Template 1',
-                'quantity' => 2,
-                'price' => 20.00,
-            ),
-            array(
-                'name' => 'Treatment Template 2 with a very long name that will wrap within the cell',
-                'quantity' => 1,
-                'price' => 10.00,
-            ),array(
-                'name' => 'Treatment Template 1',
-                'quantity' => 2,
-                'price' => 20.00,
-            ),
-            array(
-                'name' => 'Treatment Template 2 with a very long name that will wrap within the cell',
-                'quantity' => 1,
-                'price' => 10.00,
-            )
-        );
+        $InvoiceBody = InvoiceBody::find($id);
+
+        // SELECT `header_id`,SUM(`selling_price`),COUNT(`template_body_id`) FROM `invoice_bodies` LEFT OUTER JOIN `template_headers` on `template_headers`.`id` = `invoice_bodies`.`template_header_id` WHERE `header_id` = 5 GROUP BY `template_body_id`;
+
+        SELECT `header_id`,`template_headers`.`template_name`,SUM(`selling_price`),COUNT(`template_body_id`) FROM `invoice_bodies` 
+INNER JOIN `template_headers` on `template_headers`.`id` = `invoice_bodies`.`template_header_id` 
+WHERE `header_id` = 5 GROUP BY `template_body_id`;
+
+$products = InvoiceBody::with('templateHeader')
+->select('header_id', 'template_headers.template_name as name')
+->selectRaw('SUM(selling_price) as price')
+->selectRaw('COUNT(template_body_id) as quantity')
+->where('header_id', $id)
+->groupBy('template_body_id')
+->get();
+
+
+
+        // $products = array(
+        //     array(
+        //         'name' => 'Treatment Template 1',
+        //         'quantity' => 2,
+        //         'price' => 20.00,
+        //     ),
+        //     array(
+        //         'name' => 'Treatment Template 2 with a very long name that will wrap within the cell',
+        //         'quantity' => 1,
+        //         'price' => 10.00,
+        //     ),array(
+        //         'name' => 'Treatment Template 1',
+        //         'quantity' => 2,
+        //         'price' => 20.00,
+        //     ),
+        //     array(
+        //         'name' => 'Treatment Template 2 with a very long name that will wrap within the cell',
+        //         'quantity' => 1,
+        //         'price' => 10.00,
+        //     )
+        // );
     
         // Table Header..........................................................
         $pdf->Ln(2);

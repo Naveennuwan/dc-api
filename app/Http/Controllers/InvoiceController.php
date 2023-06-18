@@ -11,9 +11,36 @@ use App\Models\InvoiceHeader;
 use App\Models\InvoiceBody;
 use App\Models\MasterData;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class InvoiceController extends Controller
 {
+
+    public function abc(){
+    //     return DB::table('invoice_bodies')
+    // ->join('template_headers', 'template_headers.id', '=', 'invoice_bodies.template_header_id')
+    // ->select('header_id', 'template_headers.template_name as name', DB::raw('SUM(selling_price) as price'), DB::raw('COUNT(template_body_id) as quantity'))
+    // ->where('header_id', 5)
+    // ->groupBy('template_body_id')
+    // ->get();
+
+        return InvoiceBody::with('templateHeader')
+        // ->select('header_id', 'template_headers.template_name')
+        ->selectRaw('SUM(selling_price) as price')
+        ->selectRaw('COUNT(template_body_id) as quantity')
+        ->where('header_id',5)
+        ->groupBy('template_body_id')
+        ->get();
+
+        // return DB::select("
+        // SELECT `header_id`, `template_headers`.`template_name`, SUM(`selling_price`) as total_price, COUNT(`template_body_id`) as quantity
+        // FROM `invoice_bodies`
+        // INNER JOIN `template_headers` ON `template_headers`.`id` = `invoice_bodies`.`template_header_id`
+        // WHERE `header_id` = 5
+        // GROUP BY `template_body_id`
+        // ");
+    }
     public function Index(InvoiceRequest $request)
     {
         $user = Auth::user();
@@ -33,10 +60,15 @@ class InvoiceController extends Controller
                     ->where('center_id', $center)
                     ->sum('quantity');
 
-                if ($sum < $body['quantity']) {
-                    $Product = Products::find($body['product_id']);
-                    return response()->json(['message' => 'Insuficient Stock in ' . $Product['product']], 500);
-                }
+                    if ($sum === null) {
+                        $Product = Products::find($body['product_id']);
+                        return response()->json(['message' => 'Stock not found for ' . $Product['product']], 500);
+                    }
+    
+                    if ($sum < ($body['quantity'] * $temp['quantity'])) {
+                        $Product = Products::find($body['product_id']);
+                        return response()->json(['message' => 'Insuficient Stock in ' . $Product['product']], 500);
+                    }
             }
         }
 
@@ -130,7 +162,10 @@ class InvoiceController extends Controller
         if ($remainingQuantity > 0) {
             return response()->json(['message' => 'Insuficient Stock! Please contact your developer'], 500);
         } else {
-            return response()->json(['message' => 'Successfully Saved']);
+            return response()->json([
+                'message' => 'Successfully Saved',
+                'id' => $invoiceHeader->id
+            ]);
         }
     }
 
@@ -151,8 +186,13 @@ class InvoiceController extends Controller
                 $sum = Stock::where('product_id', $body['product_id'])
                     ->where('center_id', $center)
                     ->sum('quantity');
+                    
+                if ($sum === null) {
+                    $Product = Products::find($body['product_id']);
+                    return response()->json(['message' => 'Stock not found for ' . $Product['product']], 500);
+                }
 
-                if ($sum < $body['quantity']) {
+                if ($sum < ($body['quantity'] * $temp['quantity'])) {
                     $Product = Products::find($body['product_id']);
                     return response()->json(['message' => 'Insuficient Stock in ' . $Product['product']], 500);
                 }
@@ -162,7 +202,6 @@ class InvoiceController extends Controller
         //make Calculations
 
         $MasterData = MasterData::where('center_id', $center)->first();
-
 
         $profite = $MasterData->profite;
         $discount = $MasterData->discount;
@@ -180,7 +219,7 @@ class InvoiceController extends Controller
                     ->orderBy('created_at', 'asc')
                     ->get();
 
-                $remainingQuantity = $body['quantity'];
+                $remainingQuantity = $body['quantity'] * $temp['quantity'];
 
                 foreach ($stocks as $stock) {
                     $price = 0;
@@ -189,14 +228,16 @@ class InvoiceController extends Controller
 
                     if ($remainingQuantity >= $currentQuantity) {
 
-                        $price = $stock->price + ($stock->price * $profite / 100) * $currentQuantity;
-                        $total = $total + $price;
+                        $price = $stock->price * $currentQuantity;
+                        $pro = $price * $profite / 100;
+                        $total = $total + ($price + $pro);
 
                         $remainingQuantity -= $currentQuantity;
                     } else {
 
-                        $price = $stock->price + ($stock->price * $profite / 100) * $remainingQuantity;
-                        $total = $total + $price;
+                        $price = $stock->price  * $remainingQuantity;
+                        $pro = $price * $profite / 100;
+                        $total = $total + ($price + $pro);
 
                         $remainingQuantity = 0;
                         break;
