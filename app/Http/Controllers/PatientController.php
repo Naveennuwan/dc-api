@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PatientRequest;
 use App\Models\Patient;
+use App\Models\PatientAlergy;
+use App\Models\PatientDisease;
 use Illuminate\Support\Facades\Auth;
 
 class PatientController extends Controller
@@ -44,12 +46,27 @@ class PatientController extends Controller
         $patient->patient_type_id = $request->input('patient_type_id');
         $patient->is_active = $request->input('is_active') ?? true;
         $patient->created_by = $user->id;
-
-        if ($patient->save()) {
-            return response()->json(['message' => 'Patient created successfully']);
-        } else {
-            return response()->json(['message' => 'Failed to create Patient'], 500);
+        $patient->save();
+        
+        if (!empty($request->patient_alergies)) {
+            foreach ($request->patient_alergies as $alergy) {
+                $patientAlergy = new PatientAlergy();
+                $patientAlergy->patient_id = $patient->id;
+                $patientAlergy->alergy_id = $alergy;
+                $patientAlergy->save();
+            }
         }
+        
+        if (!empty($request->patient_diseases)) {
+            foreach ($request->patient_diseases as $disease) {
+                $patientDisease = new PatientDisease();
+                $patientDisease->patient_id = $patient->id;
+                $patientDisease->disease_id = $disease;
+                $patientDisease->save();
+            }
+        }
+
+        return response()->json(['message' => 'JoPatientb created successfully']);
     }
 
     public function Update(PatientRequest $request, $id)
@@ -65,6 +82,26 @@ class PatientController extends Controller
             $patient->patient_type_id = $request->input('patient_type_id');
             $patient->is_active = $request->input('is_active') ?? true;
             $patient->updated_by = $user->id;
+            
+            PatientAlergy::where('patient_id', $id)->delete();
+            if (!empty($request->patient_alergies)) {
+                foreach ($request->patient_alergies as $alergy) {
+                    $patientAlergy = new PatientAlergy();
+                    $patientAlergy->patient_id = $patient->id;
+                    $patientAlergy->alergy_id = $alergy;
+                    $patientAlergy->save();
+                }
+            }
+            
+            PatientDisease::where('patient_id', $id)->delete();
+            if (!empty($request->patient_diseases)) {
+                foreach ($request->patient_diseases as $disease) {
+                    $patientDisease = new PatientDisease();
+                    $patientDisease->patient_id = $patient->id;
+                    $patientDisease->disease_id = $disease;
+                    $patientDisease->save();
+                }
+            }
 
             if ($patient->save()) {
                 return response()->json(['message' => 'Patient updated successfully']);
