@@ -36,12 +36,11 @@ class TemplateController extends Controller
         $user = Auth::user();
         $template = TemplateHeader::with('templateBodies')
             ->with('templateType')
-            ->where('template_center_id', $user->center)
             ->where('id', $id)
-            ->get();
+            ->first();
 
         if ($template) {
-            return response()->$template;
+            return response()->json($template);
         } else {
             return response()->json(['message' => 'Information list not found'], 404);
         }

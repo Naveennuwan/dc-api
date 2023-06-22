@@ -95,6 +95,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //template
     Route::get('/template/{templateTypeId}', [TemplateController::class, 'GetActiveByTypes']);
     Route::get('/template/all/{centerid}', [TemplateController::class, 'GetAll']);
+    Route::get('/template-by-id/{id}', [TemplateController::class, 'GetById']);
     Route::post('/template', [TemplateController::class, 'Store']);
     Route::put('/template/{id}', [TemplateController::class, 'Update']);
     Route::delete('/template/{id}', [TemplateController::class, 'SoftDelete']);
