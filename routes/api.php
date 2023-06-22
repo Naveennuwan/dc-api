@@ -5,6 +5,7 @@ use App\Http\Controllers\AlergyController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DiseaseController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientTypeController;
 use App\Http\Controllers\ProductsController;
@@ -71,6 +72,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/category', [CategoryController::class, 'Store']);
     Route::put('/category/{id}', [CategoryController::class, 'Update']);
     Route::delete('/category/{id}', [CategoryController::class, 'SoftDelete']);
+
+    //disease
+    Route::get('/disease', [DiseaseController::class, 'GetActive']);
+    Route::get('/disease/all', [DiseaseController::class, 'GetAll']);
+    Route::post('/disease', [DiseaseController::class, 'Store']);
+    Route::put('/disease/{id}', [DiseaseController::class, 'Update']);
+    Route::delete('/disease/{id}', [DiseaseController::class, 'SoftDelete']);
 
     //patient
     Route::get('/patient', [PatientController::class, 'GetActive']);
