@@ -84,13 +84,12 @@ class TemplateController extends Controller
             $template->updated_by = $user->id;
 
             TemplateBody::where('template_id', $id)->delete();
-            if (!empty($request->job_list_selected_job_types)) {
+            if (!empty($request->template_bodies)) {
                 foreach ($request->template_bodies as $body) {
                     $templateBody = new TemplateBody();
                     $templateBody->template_id = $template->id;
                     $templateBody->product_id = $body['product_id'];
                     $templateBody->quantity = $body['quantity'];
-                    $templateBody->created_by = $user->id;
                     $templateBody->save();
                 }
             }

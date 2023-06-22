@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\AlergyController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\CategoryController;
@@ -47,6 +48,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/patient-types', [PatientTypeController::class, 'GetAll']);
     Route::get('/template-types', [TemplateTypesController::class, 'GetAll']);
+
+    //Alergy
+    Route::get('/alergy', [AlergyController::class, 'GetActive']);
+    Route::get('/alergy/all', [AlergyController::class, 'GetAll']);
+    Route::get('/alergy/{id}', [AlergyController::class, 'GetById']);
+    Route::post('/alergy', [AlergyController::class, 'Store']);
+    Route::put('/alergy/{id}', [AlergyController::class, 'Update']);
+    Route::delete('/alergy/{id}', [AlergyController::class, 'SoftDelete']);
 
     //brand
     Route::get('/brand', [BrandController::class, 'GetActive']);
