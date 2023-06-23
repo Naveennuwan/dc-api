@@ -10,6 +10,7 @@ use App\Models\InvoiceBody;
 use App\Models\Products;
 use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use TCPDF;
 use PDF;
 
@@ -84,43 +85,12 @@ class PdfController extends Controller
     
         $InvoiceBody = InvoiceBody::find($id);
 
-        // SELECT `header_id`,SUM(`selling_price`),COUNT(`template_body_id`) FROM `invoice_bodies` LEFT OUTER JOIN `template_headers` on `template_headers`.`id` = `invoice_bodies`.`template_header_id` WHERE `header_id` = 5 GROUP BY `template_body_id`;
-
-        SELECT `header_id`,`template_headers`.`template_name`,SUM(`selling_price`),COUNT(`template_body_id`) FROM `invoice_bodies` 
-INNER JOIN `template_headers` on `template_headers`.`id` = `invoice_bodies`.`template_header_id` 
-WHERE `header_id` = 5 GROUP BY `template_body_id`;
-
-$products = InvoiceBody::with('templateHeader')
-->select('header_id', 'template_headers.template_name as name')
-->selectRaw('SUM(selling_price) as price')
-->selectRaw('COUNT(template_body_id) as quantity')
-->where('header_id', $id)
-->groupBy('template_body_id')
-->get();
-
-
-
-        // $products = array(
-        //     array(
-        //         'name' => 'Treatment Template 1',
-        //         'quantity' => 2,
-        //         'price' => 20.00,
-        //     ),
-        //     array(
-        //         'name' => 'Treatment Template 2 with a very long name that will wrap within the cell',
-        //         'quantity' => 1,
-        //         'price' => 10.00,
-        //     ),array(
-        //         'name' => 'Treatment Template 1',
-        //         'quantity' => 2,
-        //         'price' => 20.00,
-        //     ),
-        //     array(
-        //         'name' => 'Treatment Template 2 with a very long name that will wrap within the cell',
-        //         'quantity' => 1,
-        //         'price' => 10.00,
-        //     )
-        // );
+        $products = DB::table('invoice_bodies')
+        ->select('header_id', 'template_headers.template_name', DB::raw('SUM(selling_price) as price'), DB::raw('COUNT(template_body_id) as quantity'))
+        ->join('template_headers', 'template_headers.id', '=', 'invoice_bodies.template_header_id')
+        ->where('header_id', $id)
+        ->groupBy('template_body_id')
+        ->get();
     
         // Table Header..........................................................
         $pdf->Ln(2);
@@ -128,8 +98,8 @@ $products = InvoiceBody::with('templateHeader')
         // Set the maximum width for each column
         $pdf->SetFont('Helvetica', 'B', $font_size_08);
         $itemWidth = 35;
-        $quantityWidth = 15;
-        $priceWidth = 15;
+        $quantityWidth = 7;
+        $priceWidth = 19;
         $totalWidth = 80 - ($itemWidth + $quantityWidth + $priceWidth);
 
         // Table Body..........................................................
@@ -147,28 +117,27 @@ $products = InvoiceBody::with('templateHeader')
         $grandTotal = 0;
 
         foreach ($products as $product) {
-            $total = $product['quantity'] * $product['price'];
-            $grandTotal += $total;
-    
+            $total = $product->quantity * $product->price;
+            $grandTotal += $total;    
             
-            $productNameHeight = $pdf->getStringHeight($itemWidth, $product['name']);
+            $productNameHeight = $pdf->getStringHeight($itemWidth, $product->template_name);
     
-            $pdf->MultiCell($itemWidth, $productNameHeight, $product['name'], 1, 'L');
+            $pdf->MultiCell($itemWidth, $productNameHeight, $product->template_name, 1, 'L');
             $pdf->SetXY($pdf->GetX() + $itemWidth, $pdf->GetY() - $productNameHeight);
     
             $pdf->setLineStyle(array('width' => 0));
-            $pdf->Cell($quantityWidth, $productNameHeight, $product['quantity'], 1, 0, 'L');
+            $pdf->Cell($quantityWidth, $productNameHeight, $product->quantity, 1, 0, 'L');
             $pdf->setLineStyle(array('width' => 0));
-            $pdf->Cell($priceWidth, $productNameHeight, '$' . number_format($product['price'], 2), 1, 0, 'L');
+            $pdf->Cell($priceWidth, $productNameHeight, 'Rs. ' . number_format($product->price, 1), 1, 0, 'L');
             $pdf->setLineStyle(array('width' => 0));
-            $pdf->Cell($totalWidth, $productNameHeight, '$' . number_format($total, 2), 1, 1, 'L');
+            $pdf->Cell($totalWidth, $productNameHeight, 'Rs. ' . number_format($total, 1), 1, 1, 'L');
         }
 
         // Table Footer..........................................................
         $pdf->SetFont('Helvetica', 'B', $font_size_10);
         $pdf->Ln(2);
-        $pdf->SetX(40);
-        $pdf->Write(0, 'Grand Total: $' . number_format($grandTotal, 2), '', 0, 'L', true, 0, false, false, 5);
+        $pdf->SetX(30);
+        $pdf->Write(0, 'Grand Total: Rs. ' . number_format($grandTotal, 2), '', 0, 'L', true, 0, false, false, 5);
 
 
         $patient = Patient::find($Header['patient_id']);

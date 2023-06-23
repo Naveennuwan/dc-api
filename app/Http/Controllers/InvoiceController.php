@@ -16,31 +16,6 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
-
-    public function abc(){
-    //     return DB::table('invoice_bodies')
-    // ->join('template_headers', 'template_headers.id', '=', 'invoice_bodies.template_header_id')
-    // ->select('header_id', 'template_headers.template_name as name', DB::raw('SUM(selling_price) as price'), DB::raw('COUNT(template_body_id) as quantity'))
-    // ->where('header_id', 5)
-    // ->groupBy('template_body_id')
-    // ->get();
-
-        return InvoiceBody::with('templateHeader')
-        // ->select('header_id', 'template_headers.template_name')
-        ->selectRaw('SUM(selling_price) as price')
-        ->selectRaw('COUNT(template_body_id) as quantity')
-        ->where('header_id',5)
-        ->groupBy('template_body_id')
-        ->get();
-
-        // return DB::select("
-        // SELECT `header_id`, `template_headers`.`template_name`, SUM(`selling_price`) as total_price, COUNT(`template_body_id`) as quantity
-        // FROM `invoice_bodies`
-        // INNER JOIN `template_headers` ON `template_headers`.`id` = `invoice_bodies`.`template_header_id`
-        // WHERE `header_id` = 5
-        // GROUP BY `template_body_id`
-        // ");
-    }
     public function Index(InvoiceRequest $request)
     {
         $user = Auth::user();
