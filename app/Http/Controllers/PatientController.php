@@ -13,19 +13,27 @@ class PatientController extends Controller
     public function GetAll()
     {
         return Patient::where('is_deleted', false)
+            ->with('alergies')
+            ->orderBy('id', 'desc')
             ->get();
     }
 
     public function GetActive()
     {
         return Patient::where('is_active', true)
+            ->with('alergies')
             ->where('is_deleted', false)
+            ->orderBy('id', 'desc')
             ->get();
     }
 
     public function GetById($id)
     {
-        $patient = Patient::find($id);
+        $patient = Patient::where('id', $id)
+            ->with('alergies')
+            ->with('disease')
+            ->where('is_deleted', false)
+            ->first();
 
         if ($patient) {
             return response()->json($patient);
@@ -43,6 +51,8 @@ class PatientController extends Controller
         $patient->patient_incharge = $request->input('patient_incharge');
         $patient->patient_address = $request->input('patient_address');
         $patient->patient_contact_no = $request->input('patient_contact_no');
+        $patient->patient_gender = $request->input('patient_gender');
+        $patient->patient_age = $request->input('patient_age');
         $patient->patient_type_id = $request->input('patient_type_id');
         $patient->is_active = $request->input('is_active') ?? true;
         $patient->created_by = $user->id;
@@ -53,7 +63,7 @@ class PatientController extends Controller
                 $patientAlergy = new PatientAlergy();
                 $patientAlergy->patient_id = $patient->id;
                 $patientAlergy->alergy_id = $alergy;
-                $patientAlergy->save();
+                $patientAlergy->save(['timestamps' => false]);
             }
         }
         
@@ -62,11 +72,11 @@ class PatientController extends Controller
                 $patientDisease = new PatientDisease();
                 $patientDisease->patient_id = $patient->id;
                 $patientDisease->disease_id = $disease;
-                $patientDisease->save();
+                $patientDisease->save(['timestamps' => false]);
             }
         }
 
-        return response()->json(['message' => 'JoPatientb created successfully']);
+        return response()->json(['message' => 'Patient created successfully']);
     }
 
     public function Update(PatientRequest $request, $id)
@@ -79,6 +89,8 @@ class PatientController extends Controller
             $patient->patient_incharge = $request->input('patient_incharge');
             $patient->patient_address = $request->input('patient_address');
             $patient->patient_contact_no = $request->input('patient_contact_no');
+            $patient->patient_gender = $request->input('patient_gender');
+            $patient->patient_age = $request->input('patient_age');
             $patient->patient_type_id = $request->input('patient_type_id');
             $patient->is_active = $request->input('is_active') ?? true;
             $patient->updated_by = $user->id;
@@ -89,7 +101,7 @@ class PatientController extends Controller
                     $patientAlergy = new PatientAlergy();
                     $patientAlergy->patient_id = $patient->id;
                     $patientAlergy->alergy_id = $alergy;
-                    $patientAlergy->save();
+                    $patientAlergy->save(['timestamps' => false]);
                 }
             }
             
@@ -99,7 +111,7 @@ class PatientController extends Controller
                     $patientDisease = new PatientDisease();
                     $patientDisease->patient_id = $patient->id;
                     $patientDisease->disease_id = $disease;
-                    $patientDisease->save();
+                    $patientDisease->save(['timestamps' => false]);
                 }
             }
 

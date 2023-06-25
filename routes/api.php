@@ -38,7 +38,6 @@ Route::get('/centers', [CenterController::class, 'GetAll']);
 Route::get('/user-type', [UserTypeController::class, 'GetAll']);
 
 Route::get('/invoice/{id}', [PdfController::class, 'Invoice']);
-Route::get('/invoice-row', [InvoiceController::class, 'abc']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
@@ -85,6 +84,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/patient/all', [PatientController::class, 'GetAll']);
     Route::post('/patient', [PatientController::class, 'Store']);
     Route::put('/patient/{id}', [PatientController::class, 'Update']);
+    Route::get('/patient/{id}', [PatientController::class, 'GetById']);
     Route::delete('/patient/{id}', [PatientController::class, 'SoftDelete']);
 
     //product

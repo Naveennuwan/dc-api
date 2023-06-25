@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class PatientDisease extends Model
 {
     use HasFactory;
+    
+    public $timestamps = false;
 
     protected $table = 'patient_diseases';
 

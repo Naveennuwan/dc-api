@@ -16,6 +16,8 @@ class Patient extends Model
         'patient_incharge',
         'patient_address',
         'patient_contact_no',
+        'patient_gender',
+        'patient_age',
         'patient_type_id',
         'is_active',
         'created_by',
@@ -28,6 +30,16 @@ class Patient extends Model
     public function patientType()
     {
         return $this->belongsTo(PatientType::class);
+    }
+
+    public function alergies()
+    {
+        return $this->hasMany(PatientAlergy::class);
+    }
+
+    public function disease()
+    {
+        return $this->hasMany(PatientDisease::class);
     }
 
     public function createdBy()

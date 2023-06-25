@@ -26,7 +26,11 @@ class PatientRequest extends FormRequest
             'patient_incharge' => 'required|string|max:100',
             'patient_address' => 'required|string|max:300',
             'patient_contact_no' => 'required|string|max:300',
+            'patient_gender' => 'required|string|max:300',
+            'patient_age' => 'required|integer',
             'patient_type_id' => 'required|exists:patient_types,id',
+            'patient_alergies' => 'nullable|array',
+            'patient_alergies.*' => 'exists:alergies,id',
         ];
     }
 }
